@@ -1,6 +1,7 @@
 package src;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,6 +17,7 @@ public class CreateAccountGUI extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
+        panel.setBackground(new Color(230, 240, 255)); // Light blue background for hospital setting
         add(panel);
         placeComponents(panel);
 
@@ -51,6 +53,7 @@ public class CreateAccountGUI extends JFrame {
 
         JButton createAccountButton = new JButton("Create Account");
         createAccountButton.setBounds(10, 110, 150, 25);
+        createAccountButton.setBackground(new Color(144, 238, 144)); // Light green background for create account button
         panel.add(createAccountButton);
 
         createAccountButton.addActionListener(new ActionListener() {
@@ -59,6 +62,11 @@ public class CreateAccountGUI extends JFrame {
                 String username = userField.getText();
                 String password = new String(passField.getPassword());
                 String confirmPassword = new String(confirmPassField.getPassword());
+
+                if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 if (!password.equals(confirmPassword)) {
                     JOptionPane.showMessageDialog(null, "Passwords do not match.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -71,6 +79,19 @@ public class CreateAccountGUI extends JFrame {
                 } else {
                     JOptionPane.showMessageDialog(null, "Failed to create account.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+        });
+
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(170, 110, 80, 25);
+        backButton.setBackground(new Color(255, 99, 71)); // Light red background for back button
+        panel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new LoginGUI();
+                dispose();
             }
         });
     }

@@ -33,6 +33,7 @@ public class PrescriptionGUI extends JFrame {
         setTitle("MyManager : Prescription Management System");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         // Initialize table model and pass it to the JTable
@@ -55,6 +56,7 @@ public class PrescriptionGUI extends JFrame {
 
         // Create a panel for form inputs and buttons using GroupLayout
         JPanel formPanel = new JPanel();
+        formPanel.setBackground(new Color(230, 240, 255)); // Light blue background for hospital setting
         GroupLayout layout = new GroupLayout(formPanel);
         formPanel.setLayout(layout);
         layout.setAutoCreateGaps(true);
@@ -102,6 +104,7 @@ public class PrescriptionGUI extends JFrame {
         JLabel searchLabel = new JLabel("Search:");
         searchField = new JTextField(15);
         JButton searchButton = new JButton("Search");
+        searchButton.setBackground(new Color(144, 238, 144)); // Light green background for search button
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -111,6 +114,7 @@ public class PrescriptionGUI extends JFrame {
 
         // Refresh button
         JButton refreshButton = new JButton("Refresh");
+        refreshButton.setBackground(new Color(144, 238, 144)); // Light green background for refresh button
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -120,6 +124,7 @@ public class PrescriptionGUI extends JFrame {
 
         // Add, Update, Delete, Wipe, Export buttons
         JButton addButton = new JButton("Add Prescription");
+        addButton.setBackground(new Color(144, 238, 144)); // Light green background for add button
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,6 +133,7 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton updateButton = new JButton("Update Prescription");
+        updateButton.setBackground(new Color(144, 238, 144)); // Light green background for update button
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -136,6 +142,7 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton deleteButton = new JButton("Delete Prescription");
+        deleteButton.setBackground(new Color(255, 99, 71)); // Light red background for delete button
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -144,6 +151,7 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton wipeButton = new JButton("Wipe Table");
+        wipeButton.setBackground(new Color(255, 99, 71)); // Light red background for wipe button
         wipeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -152,6 +160,7 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton exportButton = new JButton("Export to CSV");
+        exportButton.setBackground(new Color(144, 238, 144)); // Light green background for export button
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,6 +169,7 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(255, 99, 71)); // Light red background for logout button
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -260,22 +270,36 @@ public class PrescriptionGUI extends JFrame {
                     patientNameField.setText(selectedPrescription.getPatientName());
                     medicationField.setText(selectedPrescription.getMedication());
                     dosageField.setText(selectedPrescription.getDosage());
+                    administeredByField.setText(selectedPrescription.getAdministeredBy());
                     try {
                         // Parse the issue date string to a Calendar object
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         java.util.Date utilDate = sdf.parse(selectedPrescription.getIssueDate());
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(utilDate); // Set the Calendar time to the parsed Date
-
+        
                         // Now set the Calendar object to the date picker
-                        timeframeStartSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeStart()));
-                        timeframeEndSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeEnd()));
-                    } catch (ParseException ex) {
-                        ex.printStackTrace();
+                        issueDatePicker.getModel().setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                        issueDatePicker.getModel().setSelected(true);
+        
+                        // Ensure time values are in the correct format
+                        String timeframeStart = selectedPrescription.getTimeframeStart();
+                        String timeframeEnd = selectedPrescription.getTimeframeEnd();
+        
+                        // Validate and set time values
+                        if (timeframeStart != null && !timeframeStart.matches("\\d{2}:\\d{2} [AP]M")) {
+                            throw new IllegalArgumentException("Timeframe start must be in the format hh:mm AM/PM");
+                        }
+                        if (timeframeEnd != null && !timeframeEnd.matches("\\d{2}:\\d{2} [AP]M")) {
+                            throw new IllegalArgumentException("Timeframe end must be in the format hh:mm AM/PM");
+                        }
+        
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+                        timeframeStartSpinner.setValue(timeFormat.parse(timeframeStart));
+                        timeframeEndSpinner.setValue(timeFormat.parse(timeframeEnd));
+                    } catch (ParseException | IllegalArgumentException ex) {
+                        JOptionPane.showMessageDialog(PrescriptionGUI.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                    administeredByField.setText(selectedPrescription.getAdministeredBy());
-                    timeframeStartSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeStart()));
-                    timeframeEndSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeEnd()));
                 }
             }
         });
@@ -424,23 +448,31 @@ public class PrescriptionGUI extends JFrame {
         if (!patientName.matches("[a-zA-Z ]+")) {
             throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
         }
-
+    
         if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || timeframeStart.isEmpty() || timeframeEnd.isEmpty()) {
             throw new IllegalArgumentException("All fields must be filled.");
         }
-
+    
         // Validate issue date format (YYYY-MM-DD)
         if (!issueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
             throw new IllegalArgumentException("Issue date must be in the format YYYY-MM-DD.");
         }
-
+    
         // Validate dosage as a number
         try {
             Double.parseDouble(dosage);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Dosage must be a number.");
         }
-    }
+    
+        // Validate timeframe formats (hh:mm AM/PM)
+        if (!timeframeStart.matches("\\d{2}:\\d{2} [AP]M")) {
+            throw new IllegalArgumentException("Timeframe start must be in the format hh:mm AM/PM.");
+        }
+        if (!timeframeEnd.matches("\\d{2}:\\d{2} [AP]M")) {
+            throw new IllegalArgumentException("Timeframe end must be in the format hh:mm AM/PM.");
+        }
+    } 
 
     private void handleException(Exception ex, String userMessage) {
         if (ex instanceof NumberFormatException) {
