@@ -204,14 +204,14 @@ JLabel sortCriteriaLabel = new JLabel("Sort By:");
 String[] sortOptions = {"Dosage", "Patient Name", "Medication", "Date", "Time"};
 JComboBox<String> sortCriteriaComboBox = new JComboBox<>(sortOptions);
 
-// Update sortButton action
 sortButton.addActionListener(new ActionListener() {
     @Override
     public void actionPerformed(ActionEvent e) {
         String selectedCriteria = (String) sortCriteriaComboBox.getSelectedItem();
         List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
-        DatabaseUtil.sortPrescriptions(prescriptions, selectedCriteria.toLowerCase().replace(" ", ""));
+        DatabaseUtil.sortPrescriptions(prescriptions, Collections.singletonList(selectedCriteria.toLowerCase().replace(" ", "")));
         tableModel.setPrescriptions(prescriptions);
+        JOptionPane.showMessageDialog(null, "Prescriptions sorted by " + selectedCriteria, "Sort Completed", JOptionPane.INFORMATION_MESSAGE);
     }
 });
 
@@ -569,7 +569,8 @@ layout.setVerticalGroup(layout.createSequentialGroup()
     }
 
     private void sortPrescriptions() {
-    String sortBy = "date"; // Or obtain dynamically based on user input
+    String[] criteria = {"dosage", "patientname", "medication", "date", "time"}; // Example criteria
+    List<String> sortBy = Arrays.asList(criteria);
     List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
     DatabaseUtil.sortPrescriptions(prescriptions, sortBy);
     tableModel.setPrescriptions(prescriptions);

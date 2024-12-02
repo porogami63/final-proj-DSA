@@ -157,28 +157,37 @@ public class DatabaseUtil {
         prescriptions.clear();
     }
 
-    public static void sortPrescriptions(List<Prescription> prescriptions, String sortBy) {
-        Comparator<Prescription> comparator;
+    public static void sortPrescriptions(List<Prescription> prescriptions, List<String> sortBy) {
+        Comparator<Prescription> comparator = (p1, p2) -> 0;
     
-        switch (sortBy.toLowerCase()) {
-            case "dosage":
-            comparator = Comparator.comparing(Prescription::getDosage).reversed(); // Change to descending order                
-                break;
-            case "patientname":
-                comparator = Comparator.comparing(Prescription::getPatientName);
-                break;
-            case "medication":
-                comparator = Comparator.comparing(Prescription::getMedication);
-                break;
-            case "date":
-                comparator = Comparator.comparing(Prescription::getIssueDate);
-                break;
-            case "time":
-                comparator = Comparator.comparing(Prescription::getTimeframeStart);
-            default:
-                throw new IllegalArgumentException("Invalid sort criteria: " + sortBy);
+        for (String criteria : sortBy) {
+            Comparator<Prescription> tempComparator;
+    
+            switch (criteria.toLowerCase()) {
+                case "dosage":
+                    tempComparator = Comparator.comparing(Prescription::getDosage).reversed();
+                    break;
+                case "patientname":
+                    tempComparator = Comparator.comparing(Prescription::getPatientName);
+                    break;
+                case "medication":
+                    tempComparator = Comparator.comparing(Prescription::getMedication);
+                    break;
+                case "date":
+                    tempComparator = Comparator.comparing(Prescription::getIssueDate);
+                    break;
+                case "time":
+                    tempComparator = Comparator.comparing(Prescription::getTimeframeStart);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid sort criteria: " + criteria);
+            }
+    
+            comparator = comparator.thenComparing(tempComparator);
         }
     
         prescriptions.sort(comparator);
     }
+    
+    
 }
