@@ -250,35 +250,35 @@ public class PrescriptionGUI extends JFrame {
         updatePrescriptionTable();
 
         // Add mouse listener to the table to reflect selected prescription's information in the text fields
-       // Inside the mouseClicked method of the MouseAdapter
-       prescriptionTable.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int selectedRow = prescriptionTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                Prescription selectedPrescription = tableModel.getPrescriptionAt(selectedRow);
-                idField.setText(String.valueOf(selectedPrescription.getPrescriptionId()));
-                patientNameField.setText(selectedPrescription.getPatientName());
-                medicationField.setText(selectedPrescription.getMedication());
-                dosageField.setText(selectedPrescription.getDosage());
-                try {
-                    // Parse the issue date string to a Calendar object
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date utilDate = sdf.parse(selectedPrescription.getIssueDate());
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(utilDate); // Set the Calendar time to the parsed Date
-    
-                    // Now set the Calendar object to the date picker
-                    issueDatePicker.getModel().setValue(cal);
-                } catch (ParseException ex) {
-                    ex.printStackTrace();
+        prescriptionTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = prescriptionTable.getSelectedRow();
+                if (selectedRow >= 0) {
+                    Prescription selectedPrescription = tableModel.getPrescriptionAt(selectedRow);
+                    idField.setText(String.valueOf(selectedPrescription.getPrescriptionId()));
+                    patientNameField.setText(selectedPrescription.getPatientName());
+                    medicationField.setText(selectedPrescription.getMedication());
+                    dosageField.setText(selectedPrescription.getDosage());
+                    try {
+                        // Parse the issue date string to a Calendar object
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        java.util.Date utilDate = sdf.parse(selectedPrescription.getIssueDate());
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(utilDate); // Set the Calendar time to the parsed Date
+
+                        // Now set the Calendar object to the date picker
+                        timeframeStartSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeStart()));
+                        timeframeEndSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeEnd()));
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                    administeredByField.setText(selectedPrescription.getAdministeredBy());
+                    timeframeStartSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeStart()));
+                    timeframeEndSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeEnd()));
                 }
-                administeredByField.setText(selectedPrescription.getAdministeredBy());
-                timeframeStartSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeStart()));
-                timeframeEndSpinner.setValue(java.sql.Time.valueOf(selectedPrescription.getTimeframeEnd()));
             }
-        }
-    });
+        });
     }
 
     // Method to search prescription by various fields
@@ -308,25 +308,7 @@ public class PrescriptionGUI extends JFrame {
             String timeframeStart = ((JSpinner.DateEditor) timeframeStartSpinner.getEditor()).getFormat().format(timeframeStartSpinner.getValue());
             String timeframeEnd = ((JSpinner.DateEditor) timeframeEndSpinner.getEditor()).getFormat().format(timeframeEndSpinner.getValue());
 
-            if (!patientName.matches("[a-zA-Z ]+")) {
-                throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
-            }
-
-            if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || timeframeStart.isEmpty() || timeframeEnd.isEmpty()) {
-                throw new IllegalArgumentException("All fields must be filled.");
-            }
-
-            // Validate issue date format (YYYY-MM-DD)
-            if (!issueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                throw new IllegalArgumentException("Issue date must be in the format YYYY-MM-DD.");
-            }
-
-            // Validate dosage as a number
-            try {
-                Double.parseDouble(dosage);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Dosage must be a number.");
-            }
+            validateInputs(patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
 
             // Check for duplicate ID
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
@@ -340,11 +322,11 @@ public class PrescriptionGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Prescription added successfully.");
             clearFields();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numeric data where required.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "Invalid input. Please enter valid numeric data where required.");
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, ex.getMessage());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred while adding the prescription.", "Error", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "An error occurred while adding the prescription.");
         }
     }
 
@@ -359,25 +341,7 @@ public class PrescriptionGUI extends JFrame {
             String timeframeStart = ((JSpinner.DateEditor) timeframeStartSpinner.getEditor()).getFormat().format(timeframeStartSpinner.getValue());
             String timeframeEnd = ((JSpinner.DateEditor) timeframeEndSpinner.getEditor()).getFormat().format(timeframeEndSpinner.getValue());
 
-            if (!patientName.matches("[a-zA-Z ]+")) {
-                throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
-            }
-
-            if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || timeframeStart.isEmpty() || timeframeEnd.isEmpty()) {
-                throw new IllegalArgumentException("All fields must be filled.");
-            }
-
-            // Validate issue date format (YYYY-MM-DD)
-            if (!issueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                throw new IllegalArgumentException("Issue date must be in the format YYYY-MM-DD.");
-            }
-
-            // Validate dosage as a number
-            try {
-                Double.parseDouble(dosage);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Dosage must be a number.");
-            }
+            validateInputs(patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
 
             Prescription updatedPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
             DatabaseUtil.updatePrescription(updatedPrescription);
@@ -385,11 +349,11 @@ public class PrescriptionGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Prescription updated successfully.");
             clearFields();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numeric data where required.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "Invalid input. Please enter valid numeric data where required.");
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, ex.getMessage());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred while updating the prescription.", "Error", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "An error occurred while updating the prescription.");
         }
     }
 
@@ -401,9 +365,9 @@ public class PrescriptionGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Prescription deleted successfully.");
             clearFields();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid ID. Please enter a valid ID.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "Invalid ID. Please enter a valid ID.");
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred while deleting the prescription.", "Error", JOptionPane.ERROR_MESSAGE);
+            handleException(ex, "An error occurred while deleting the prescription.");
         }
     }
 
@@ -453,6 +417,38 @@ public class PrescriptionGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Exported to CSV successfully.");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error writing to CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String timeframeStart, String timeframeEnd) {
+        if (!patientName.matches("[a-zA-Z ]+")) {
+            throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
+        }
+
+        if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || timeframeStart.isEmpty() || timeframeEnd.isEmpty()) {
+            throw new IllegalArgumentException("All fields must be filled.");
+        }
+
+        // Validate issue date format (YYYY-MM-DD)
+        if (!issueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("Issue date must be in the format YYYY-MM-DD.");
+        }
+
+        // Validate dosage as a number
+        try {
+            Double.parseDouble(dosage);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Dosage must be a number.");
+        }
+    }
+
+    private void handleException(Exception ex, String userMessage) {
+        if (ex instanceof NumberFormatException) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numeric data where required.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        } else if (ex instanceof IllegalArgumentException) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, userMessage, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
