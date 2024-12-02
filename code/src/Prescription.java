@@ -1,5 +1,9 @@
 package src;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Prescription {
     private int prescriptionId;
     private String patientName;
@@ -84,5 +88,25 @@ public class Prescription {
 
     public void setTimeframeEnd(String timeframeEnd) {
         this.timeframeEnd = timeframeEnd;
+    }
+
+        private static Queue<String[][]> prescriptionQueue = new LinkedList<>();
+
+    public static void addToQueue(String[][] prescriptionData) {
+        prescriptionQueue.add(prescriptionData);
+    }
+
+    public static String[][] removeFromQueue() {
+        return prescriptionQueue.poll();
+    }
+
+    public static boolean isQueueEmpty() {
+        return prescriptionQueue.isEmpty();
+    }
+
+    public static void printQueue() {
+        for (String[][] data : prescriptionQueue) {
+            System.out.println(Arrays.deepToString(data));
+        }
     }
 }

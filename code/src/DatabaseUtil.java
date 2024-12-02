@@ -1,6 +1,7 @@
 package src;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class DatabaseUtil {
@@ -154,5 +155,25 @@ public class DatabaseUtil {
             e.printStackTrace();
         }
         prescriptions.clear();
+    }
+
+    public static void sortPrescriptions(List<Prescription> prescriptions, String sortBy) {
+        Comparator<Prescription> comparator = null;
+
+        switch (sortBy.toLowerCase()) {
+            case "time":
+                comparator = Comparator.comparing(Prescription::getTimeframeStart);
+                break;
+            case "date":
+                comparator = Comparator.comparing(Prescription::getIssueDate);
+                break;
+            case "dosage":
+                comparator = Comparator.comparing(Prescription::getDosage);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid sort criteria: " + sortBy);
+        }
+
+        prescriptions.sort(comparator);
     }
 }

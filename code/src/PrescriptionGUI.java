@@ -10,7 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.*;
 import java.util.List;
 import java.util.Properties;
 import java.io.FileWriter;
@@ -181,6 +181,25 @@ public class PrescriptionGUI extends JFrame {
             }
         });
 
+        // Add Sort and Queue buttons
+        JButton sortButton = new JButton("Sort Prescriptions");
+        sortButton.setBackground(new Color(144, 238, 144)); // Light green background for sort button
+        sortButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sortPrescriptions();
+            }
+        });
+
+        JButton queueButton = new JButton("Queue Prescription");
+        queueButton.setBackground(new Color(144, 238, 144)); // Light green background for queue button
+        queueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                queuePrescription();
+            }
+        });
+
         // Layout code for formPanel
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -212,7 +231,10 @@ public class PrescriptionGUI extends JFrame {
                                 .addComponent(refreshButton)
                                 .addComponent(wipeButton)
                                 .addComponent(exportButton)
-                                .addComponent(logoutButton)))
+                                .addComponent(logoutButton))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(sortButton)
+                                .addComponent(queueButton)))
         );
 
         layout.setVerticalGroup(layout.createSequentialGroup()
@@ -252,6 +274,9 @@ public class PrescriptionGUI extends JFrame {
                         .addComponent(wipeButton)
                         .addComponent(exportButton)
                         .addComponent(logoutButton))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(sortButton)
+                        .addComponent(queueButton))
         );
 
         add(formPanel, BorderLayout.SOUTH);
@@ -420,7 +445,7 @@ public class PrescriptionGUI extends JFrame {
         }
     }
 
-    private void exportToCSV() {
+    private void exportToCSV(){
         String fileName = "prescriptions.csv";
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             // Write header
