@@ -1,6 +1,7 @@
 package src;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -187,6 +188,21 @@ public class DatabaseUtil {
         }
     
         prescriptions.sort(comparator);
+    }
+    public static void saveQueueToDatabase() {
+        String query = "INSERT INTO queue (prescription_data) VALUES (?)";
+    
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    
+            for (String[][] prescriptionData : Prescription.prescriptionQueue) {
+                pstmt.setString(1, Arrays.deepToString(prescriptionData));
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     

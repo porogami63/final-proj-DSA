@@ -164,6 +164,7 @@ public class PrescriptionGUI extends JFrame {
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Prescription.removeElementsBasedOnTimeframe();
                 exportToCSV();
             }
         });
@@ -199,6 +200,27 @@ public class PrescriptionGUI extends JFrame {
                 queuePrescription();
             }
         });
+
+        JButton saveQueueToDatabaseButton = new JButton("Save Queue to Database");
+saveQueueToDatabaseButton.setBackground(new Color(144, 238, 144));
+saveQueueToDatabaseButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Prescription.removeElementsBasedOnTimeframe();
+        DatabaseUtil.saveQueueToDatabase();
+        JOptionPane.showMessageDialog(null, "Queue saved to database successfully.");
+    }
+});
+
+JButton wipeQueueButton = new JButton("Wipe Queue");
+wipeQueueButton.setBackground(new Color(255, 99, 71));
+wipeQueueButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Prescription.prescriptionQueue.clear();
+        JOptionPane.showMessageDialog(null, "Queue wiped successfully.");
+    }
+});
        // Add Sorting Criteria Dropdown
 JLabel sortCriteriaLabel = new JLabel("Sort By:");
 String[] sortOptions = {"Dosage", "Patient Name", "Medication", "Date", "Time"};
@@ -221,12 +243,16 @@ viewQueueButton.setBackground(new Color(144, 238, 144));
 viewQueueButton.addActionListener(new ActionListener() {
     @Override
     public void actionPerformed(ActionEvent e) {
-        StringBuilder queueContent = new StringBuilder();
-        Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
-        for (String[][] data : queue) {
-            queueContent.append(Arrays.deepToString(data)).append("\n");
+        if (Prescription.prescriptionQueue == null || Prescription.prescriptionQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "The queue is not initialized or is empty.", "Queue Status", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            StringBuilder queueContent = new StringBuilder();
+            Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
+            for (String[][] data : queue) {
+                queueContent.append(Arrays.deepToString(data)).append("\n");
+            }
+            JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
         }
-        JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
     }
 });
 
@@ -240,17 +266,16 @@ checkQueueButton.addActionListener(new ActionListener() {
     }
 });
 
-JButton printQueueButton = new JButton("Print Queue");
-printQueueButton.setBackground(new Color(144, 238, 144));
-printQueueButton.addActionListener(new ActionListener() {
+JButton removeFromQueueButton = new JButton("Remove from Queue");
+removeFromQueueButton.setBackground(new Color(255, 99, 71)); // Light red background for remove button
+removeFromQueueButton.addActionListener(new ActionListener() {
     @Override
     public void actionPerformed(ActionEvent e) {
-        Prescription.printQueue();
+        removeFromQueue();
     }
 });
 
-        // Layout code for formPanel
-        layout.setHorizontalGroup(layout.createSequentialGroup()
+layout.setHorizontalGroup(layout.createSequentialGroup()
     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
         .addComponent(idLabel)
         .addComponent(patientNameLabel)
@@ -288,7 +313,8 @@ printQueueButton.addActionListener(new ActionListener() {
             .addComponent(queueButton)
             .addComponent(viewQueueButton)
             .addComponent(checkQueueButton)
-            .addComponent(printQueueButton)))
+            .addComponent(wipeQueueButton)
+            .addComponent(saveQueueToDatabaseButton)))
 );
 
 layout.setVerticalGroup(layout.createSequentialGroup()
@@ -336,7 +362,8 @@ layout.setVerticalGroup(layout.createSequentialGroup()
         .addComponent(queueButton)
         .addComponent(viewQueueButton)
         .addComponent(checkQueueButton)
-        .addComponent(printQueueButton))
+        .addComponent(wipeQueueButton)
+        .addComponent(saveQueueToDatabaseButton))
 );
         add(formPanel, BorderLayout.SOUTH);
 
@@ -504,12 +531,12 @@ layout.setVerticalGroup(layout.createSequentialGroup()
         }
     }
 
-    private void exportToCSV(){
+    private void exportToCSV() {
         String fileName = "prescriptions.csv";
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             // Write header
             fileWriter.append("ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Timeframe Start,Timeframe End\n");
-
+    
             // Write prescription data
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
             for (Prescription prescription : prescriptions) {
@@ -522,10 +549,18 @@ layout.setVerticalGroup(layout.createSequentialGroup()
                 fileWriter.append(prescription.getTimeframeStart() + ",");
                 fileWriter.append(prescription.getTimeframeEnd() + "\n");
             }
+    
+            // Write queue data
+            for (String[][] prescriptionData : Prescription.prescriptionQueue) {
+                for (String[] row : prescriptionData) {
+                    fileWriter.append(String.join(",", row)).append("\n");
+                }
+            }
             JOptionPane.showMessageDialog(this, "Exported to CSV successfully.");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error writing to CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        
     }
 
     private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String timeframeStart, String timeframeEnd) {
@@ -581,6 +616,30 @@ private void queuePrescription() {
     };
     Prescription.addToQueue(prescriptionData);
     JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
+}
+
+private void removeFromQueue() {
+    String idToRemove = JOptionPane.showInputDialog(this, "Enter the ID of the prescription to remove from the queue:");
+
+    if (idToRemove != null && !idToRemove.trim().isEmpty()) {
+        boolean removed = false;
+        Queue<String[][]> updatedQueue = new LinkedList<>();
+        
+        for (String[][] data : Prescription.prescriptionQueue) {
+            if (data[0][0].equals(idToRemove)) {
+                removed = true;
+            } else {
+                updatedQueue.add(data);
+            }
+        }
+        
+        if (removed) {
+            Prescription.prescriptionQueue = updatedQueue;
+            JOptionPane.showMessageDialog(this, "Prescription with ID " + idToRemove + " removed from the queue.");
+        } else {
+            JOptionPane.showMessageDialog(this, "No prescription with ID " + idToRemove + " found in the queue.");
+        }
+    }
 }
 
     public static void main(String[] args) {

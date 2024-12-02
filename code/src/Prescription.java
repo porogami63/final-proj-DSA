@@ -3,6 +3,9 @@ package src;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class Prescription {
     private int prescriptionId;
@@ -90,7 +93,7 @@ public class Prescription {
         this.timeframeEnd = timeframeEnd;
     }
 
-        static Queue<String[][]> prescriptionQueue = new LinkedList<>();
+    static Queue<String[][]> prescriptionQueue = new LinkedList<>();
 
     public static void addToQueue(String[][] prescriptionData) {
         prescriptionQueue.add(prescriptionData);
@@ -108,5 +111,21 @@ public class Prescription {
         for (String[][] data : prescriptionQueue) {
             System.out.println(Arrays.deepToString(data));
         }
+    }
+
+    // Remove elements based on timeframe
+    public static void removeElementsBasedOnTimeframe() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        Queue<String[][]> queue = prescriptionQueue;
+        queue.removeIf(data -> {
+            try {
+                Date date = sdf.parse(data[0][4]);
+                // Add your logic to check the timeframe
+                return false;
+            } catch (ParseException e) {
+                System.err.println("Unparseable date: " + data[0][4]);
+                return true; // Remove if date is unparseable
+            }
+        });
     }
 }
