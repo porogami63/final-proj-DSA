@@ -158,22 +158,27 @@ public class DatabaseUtil {
     }
 
     public static void sortPrescriptions(List<Prescription> prescriptions, String sortBy) {
-        Comparator<Prescription> comparator = null;
-
+        Comparator<Prescription> comparator;
+    
         switch (sortBy.toLowerCase()) {
-            case "time":
-                comparator = Comparator.comparing(Prescription::getTimeframeStart);
+            case "dosage":
+            comparator = Comparator.comparing(Prescription::getDosage).reversed(); // Change to descending order                
+                break;
+            case "patientname":
+                comparator = Comparator.comparing(Prescription::getPatientName);
+                break;
+            case "medication":
+                comparator = Comparator.comparing(Prescription::getMedication);
                 break;
             case "date":
                 comparator = Comparator.comparing(Prescription::getIssueDate);
                 break;
-            case "dosage":
-                comparator = Comparator.comparing(Prescription::getDosage);
-                break;
+            case "time":
+                comparator = Comparator.comparing(Prescription::getTimeframeStart);
             default:
                 throw new IllegalArgumentException("Invalid sort criteria: " + sortBy);
         }
-
+    
         prescriptions.sort(comparator);
     }
 }

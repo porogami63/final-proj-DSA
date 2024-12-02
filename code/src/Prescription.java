@@ -90,7 +90,7 @@ public class Prescription {
         this.timeframeEnd = timeframeEnd;
     }
 
-        private static Queue<String[][]> prescriptionQueue = new LinkedList<>();
+        static Queue<String[][]> prescriptionQueue = new LinkedList<>();
 
     public static void addToQueue(String[][] prescriptionData) {
         prescriptionQueue.add(prescriptionData);

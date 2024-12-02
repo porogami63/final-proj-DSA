@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-import java.util.Properties;
+import java.util.Queue;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -199,86 +199,145 @@ public class PrescriptionGUI extends JFrame {
                 queuePrescription();
             }
         });
+       // Add Sorting Criteria Dropdown
+JLabel sortCriteriaLabel = new JLabel("Sort By:");
+String[] sortOptions = {"Dosage", "Patient Name", "Medication", "Date", "Time"};
+JComboBox<String> sortCriteriaComboBox = new JComboBox<>(sortOptions);
+
+// Update sortButton action
+sortButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String selectedCriteria = (String) sortCriteriaComboBox.getSelectedItem();
+        List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
+        DatabaseUtil.sortPrescriptions(prescriptions, selectedCriteria.toLowerCase().replace(" ", ""));
+        tableModel.setPrescriptions(prescriptions);
+    }
+});
+
+// Step 2: Add Queue Operations Buttons
+JButton viewQueueButton = new JButton("View Queue");
+viewQueueButton.setBackground(new Color(144, 238, 144));
+viewQueueButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        StringBuilder queueContent = new StringBuilder();
+        Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
+        for (String[][] data : queue) {
+            queueContent.append(Arrays.deepToString(data)).append("\n");
+        }
+        JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
+    }
+});
+
+JButton checkQueueButton = new JButton("Check Queue Empty");
+checkQueueButton.setBackground(new Color(144, 238, 144));
+checkQueueButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        boolean isEmpty = Prescription.isQueueEmpty();
+        JOptionPane.showMessageDialog(null, "Queue is " + (isEmpty ? "empty." : "not empty."), "Queue Status", JOptionPane.INFORMATION_MESSAGE);
+    }
+});
+
+JButton printQueueButton = new JButton("Print Queue");
+printQueueButton.setBackground(new Color(144, 238, 144));
+printQueueButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Prescription.printQueue();
+    }
+});
 
         // Layout code for formPanel
         layout.setHorizontalGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(idLabel)
-                        .addComponent(patientNameLabel)
-                        .addComponent(medicationLabel)
-                        .addComponent(dosageLabel)
-                        .addComponent(issueDateLabel)
-                        .addComponent(administeredByLabel)
-                        .addComponent(timeframeStartLabel)
-                        .addComponent(timeframeEndLabel)
-                        .addComponent(searchLabel))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(idField)
-                        .addComponent(patientNameField)
-                        .addComponent(medicationField)
-                        .addComponent(dosageField)
-                        .addComponent(issueDatePicker)
-                        .addComponent(administeredByField)
-                        .addComponent(timeframeStartSpinner)
-                        .addComponent(timeframeEndSpinner)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(searchField)
-                                .addComponent(searchButton))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(addButton)
-                                .addComponent(updateButton)
-                                .addComponent(deleteButton)
-                                .addComponent(refreshButton)
-                                .addComponent(wipeButton)
-                                .addComponent(exportButton)
-                                .addComponent(logoutButton))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(sortButton)
-                                .addComponent(queueButton)))
-        );
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        .addComponent(idLabel)
+        .addComponent(patientNameLabel)
+        .addComponent(medicationLabel)
+        .addComponent(dosageLabel)
+        .addComponent(issueDateLabel)
+        .addComponent(administeredByLabel)
+        .addComponent(timeframeStartLabel)
+        .addComponent(timeframeEndLabel)
+        .addComponent(searchLabel)
+        .addComponent(sortCriteriaLabel))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        .addComponent(idField)
+        .addComponent(patientNameField)
+        .addComponent(medicationField)
+        .addComponent(dosageField)
+        .addComponent(issueDatePicker)
+        .addComponent(administeredByField)
+        .addComponent(timeframeStartSpinner)
+        .addComponent(timeframeEndSpinner)
+        .addGroup(layout.createSequentialGroup()
+            .addComponent(searchField)
+            .addComponent(searchButton))
+        .addComponent(sortCriteriaComboBox)
+        .addGroup(layout.createSequentialGroup()
+            .addComponent(addButton)
+            .addComponent(updateButton)
+            .addComponent(deleteButton)
+            .addComponent(refreshButton)
+            .addComponent(wipeButton)
+            .addComponent(exportButton)
+            .addComponent(logoutButton))
+        .addGroup(layout.createSequentialGroup()
+            .addComponent(sortButton)
+            .addComponent(queueButton)
+            .addComponent(viewQueueButton)
+            .addComponent(checkQueueButton)
+            .addComponent(printQueueButton)))
+);
 
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(idLabel)
-                        .addComponent(idField))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(patientNameLabel)
-                        .addComponent(patientNameField))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(medicationLabel)
-                        .addComponent(medicationField))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(dosageLabel)
-                        .addComponent(dosageField))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(issueDateLabel)
-                        .addComponent(issueDatePicker))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(administeredByLabel)
-                        .addComponent(administeredByField))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(timeframeStartLabel)
-                        .addComponent(timeframeStartSpinner))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(timeframeEndLabel)
-                        .addComponent(timeframeEndSpinner))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(searchLabel)
-                        .addComponent(searchField)
-                        .addComponent(searchButton))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(addButton)
-                        .addComponent(updateButton)
-                        .addComponent(deleteButton)
-                        .addComponent(refreshButton)
-                        .addComponent(wipeButton)
-                        .addComponent(exportButton)
-                        .addComponent(logoutButton))
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(sortButton)
-                        .addComponent(queueButton))
-        );
-
+layout.setVerticalGroup(layout.createSequentialGroup()
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(idLabel)
+        .addComponent(idField))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(patientNameLabel)
+        .addComponent(patientNameField))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(medicationLabel)
+        .addComponent(medicationField))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(dosageLabel)
+        .addComponent(dosageField))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(issueDateLabel)
+        .addComponent(issueDatePicker))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(administeredByLabel)
+        .addComponent(administeredByField))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(timeframeStartLabel)
+        .addComponent(timeframeStartSpinner))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(timeframeEndLabel)
+        .addComponent(timeframeEndSpinner))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(searchLabel)
+        .addComponent(searchField)
+        .addComponent(searchButton))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(sortCriteriaLabel)
+        .addComponent(sortCriteriaComboBox))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(addButton)
+        .addComponent(updateButton)
+        .addComponent(deleteButton)
+        .addComponent(refreshButton)
+        .addComponent(wipeButton)
+        .addComponent(exportButton)
+        .addComponent(logoutButton))
+    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        .addComponent(sortButton)
+        .addComponent(queueButton)
+        .addComponent(viewQueueButton)
+        .addComponent(checkQueueButton)
+        .addComponent(printQueueButton))
+);
         add(formPanel, BorderLayout.SOUTH);
 
         // Initial data load
@@ -508,6 +567,20 @@ public class PrescriptionGUI extends JFrame {
             JOptionPane.showMessageDialog(this, userMessage, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void sortPrescriptions() {
+    String sortBy = "date"; // Or obtain dynamically based on user input
+    List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
+    DatabaseUtil.sortPrescriptions(prescriptions, sortBy);
+    tableModel.setPrescriptions(prescriptions);
+}
+private void queuePrescription() {
+    String[][] prescriptionData = new String[][] {
+        { idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), timeframeStartSpinner.getValue().toString(), timeframeEndSpinner.getValue().toString() }
+    };
+    Prescription.addToQueue(prescriptionData);
+    JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
