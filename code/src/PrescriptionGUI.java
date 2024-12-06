@@ -26,7 +26,7 @@ public class PrescriptionGUI extends JFrame {
     private PrescriptionTableModel tableModel;
     private JTextField idField, patientNameField, medicationField, dosageField, administeredByField;
     private JDatePickerImpl issueDatePicker;
-    private JSpinner timeframeStartSpinner, timeframeEndSpinner;
+    private JSpinner prescribedTimeSpinner, timeAdministeredSpinner;
     private JTextField searchField;
 
     public PrescriptionGUI() {
@@ -84,21 +84,21 @@ public class PrescriptionGUI extends JFrame {
 
         JLabel administeredByLabel = new JLabel("Administered By:");
         administeredByField = new JTextField();
-        JLabel timeframeStartLabel = new JLabel("Timeframe Start:");
+        JLabel prescribedTimeLabel = new JLabel("Prescribed Time:");
 
-        // Initialize and configure the start time spinner
+        // Initialize and configure the prescribed time spinner
         SpinnerDateModel startModel = new SpinnerDateModel();
-        timeframeStartSpinner = new JSpinner(startModel);
-        JSpinner.DateEditor startEditor = new JSpinner.DateEditor(timeframeStartSpinner, "hh:mm a");
-        timeframeStartSpinner.setEditor(startEditor);
+        prescribedTimeSpinner = new JSpinner(startModel);
+        JSpinner.DateEditor startEditor = new JSpinner.DateEditor(prescribedTimeSpinner, "hh:mm a");
+        prescribedTimeSpinner.setEditor(startEditor);
 
-        JLabel timeframeEndLabel = new JLabel("Timeframe End:");
+        JLabel timeAdministeredLabel = new JLabel("Time Administered:");
 
-        // Initialize and configure the end time spinner
+        // Initialize and configure the time administered spinner
         SpinnerDateModel endModel = new SpinnerDateModel();
-        timeframeEndSpinner = new JSpinner(endModel);
-        JSpinner.DateEditor endEditor = new JSpinner.DateEditor(timeframeEndSpinner, "hh:mm a");
-        timeframeEndSpinner.setEditor(endEditor);
+        timeAdministeredSpinner = new JSpinner(endModel);
+        JSpinner.DateEditor endEditor = new JSpinner.DateEditor(timeAdministeredSpinner, "hh:mm a");
+        timeAdministeredSpinner.setEditor(endEditor);
 
         // Search field and button
         JLabel searchLabel = new JLabel("Search:");
@@ -202,169 +202,170 @@ public class PrescriptionGUI extends JFrame {
         });
 
         JButton saveQueueToDatabaseButton = new JButton("Save Queue to Database");
-saveQueueToDatabaseButton.setBackground(new Color(144, 238, 144));
-saveQueueToDatabaseButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Prescription.removeElementsBasedOnTimeframe();
-        DatabaseUtil.saveQueueToDatabase();
-        JOptionPane.showMessageDialog(null, "Queue saved to database successfully.");
-    }
-});
-
-JButton wipeQueueButton = new JButton("Wipe Queue");
-wipeQueueButton.setBackground(new Color(255, 99, 71));
-wipeQueueButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Prescription.prescriptionQueue.clear();
-        JOptionPane.showMessageDialog(null, "Queue wiped successfully.");
-    }
-});
-       // Add Sorting Criteria Dropdown
-JLabel sortCriteriaLabel = new JLabel("Sort By:");
-String[] sortOptions = {"Dosage", "Patient Name", "Medication", "Date", "Time"};
-JComboBox<String> sortCriteriaComboBox = new JComboBox<>(sortOptions);
-
-sortButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String selectedCriteria = (String) sortCriteriaComboBox.getSelectedItem();
-        List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
-        DatabaseUtil.sortPrescriptions(prescriptions, Collections.singletonList(selectedCriteria.toLowerCase().replace(" ", "")));
-        tableModel.setPrescriptions(prescriptions);
-        JOptionPane.showMessageDialog(null, "Prescriptions sorted by " + selectedCriteria, "Sort Completed", JOptionPane.INFORMATION_MESSAGE);
-    }
-});
-
-// Step 2: Add Queue Operations Buttons
-JButton viewQueueButton = new JButton("View Queue");
-viewQueueButton.setBackground(new Color(144, 238, 144));
-viewQueueButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (Prescription.prescriptionQueue == null || Prescription.prescriptionQueue.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "The queue is not initialized or is empty.", "Queue Status", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            StringBuilder queueContent = new StringBuilder();
-            Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
-            for (String[][] data : queue) {
-                queueContent.append(Arrays.deepToString(data)).append("\n");
+        saveQueueToDatabaseButton.setBackground(new Color(144, 238, 144));
+        saveQueueToDatabaseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Prescription.removeElementsBasedOnTimeframe();
+                DatabaseUtil.saveQueueToDatabase();
+                JOptionPane.showMessageDialog(null, "Queue saved to database successfully.");
             }
-            JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-});
+        });
 
-JButton checkQueueButton = new JButton("Check Queue Empty");
-checkQueueButton.setBackground(new Color(144, 238, 144));
-checkQueueButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        boolean isEmpty = Prescription.isQueueEmpty();
-        JOptionPane.showMessageDialog(null, "Queue is " + (isEmpty ? "empty." : "not empty."), "Queue Status", JOptionPane.INFORMATION_MESSAGE);
-    }
-});
+        JButton wipeQueueButton = new JButton("Wipe Queue");
+        wipeQueueButton.setBackground(new Color(255, 99, 71));
+        wipeQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Prescription.prescriptionQueue.clear();
+                JOptionPane.showMessageDialog(null, "Queue wiped successfully.");
+            }
+        });
 
-JButton removeFromQueueButton = new JButton("Remove from Queue");
-removeFromQueueButton.setBackground(new Color(255, 99, 71)); // Light red background for remove button
-removeFromQueueButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        removeFromQueue();
-    }
-});
+        // Add Sorting Criteria Dropdown
+        JLabel sortCriteriaLabel = new JLabel("Sort By:");
+        String[] sortOptions = {"Dosage", "Patient Name", "Medication", "Date", "Time"};
+        JComboBox<String> sortCriteriaComboBox = new JComboBox<>(sortOptions);
 
-layout.setHorizontalGroup(layout.createSequentialGroup()
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-        .addComponent(idLabel)
-        .addComponent(patientNameLabel)
-        .addComponent(medicationLabel)
-        .addComponent(dosageLabel)
-        .addComponent(issueDateLabel)
-        .addComponent(administeredByLabel)
-        .addComponent(timeframeStartLabel)
-        .addComponent(timeframeEndLabel)
-        .addComponent(searchLabel)
-        .addComponent(sortCriteriaLabel))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-        .addComponent(idField)
-        .addComponent(patientNameField)
-        .addComponent(medicationField)
-        .addComponent(dosageField)
-        .addComponent(issueDatePicker)
-        .addComponent(administeredByField)
-        .addComponent(timeframeStartSpinner)
-        .addComponent(timeframeEndSpinner)
-        .addGroup(layout.createSequentialGroup()
-            .addComponent(searchField)
-            .addComponent(searchButton))
-        .addComponent(sortCriteriaComboBox)
-        .addGroup(layout.createSequentialGroup()
-            .addComponent(addButton)
-            .addComponent(updateButton)
-            .addComponent(deleteButton)
-            .addComponent(refreshButton)
-            .addComponent(wipeButton)
-            .addComponent(exportButton)
-            .addComponent(logoutButton))
-        .addGroup(layout.createSequentialGroup()
-            .addComponent(sortButton)
-            .addComponent(queueButton)
-            .addComponent(viewQueueButton)
-            .addComponent(checkQueueButton)
-            .addComponent(wipeQueueButton)
-            .addComponent(saveQueueToDatabaseButton)))
-);
+        sortButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedCriteria = (String) sortCriteriaComboBox.getSelectedItem();
+                List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
+                DatabaseUtil.sortPrescriptions(prescriptions, Collections.singletonList(selectedCriteria.toLowerCase().replace(" ", "")));
+                tableModel.setPrescriptions(prescriptions);
+                JOptionPane.showMessageDialog(null, "Prescriptions sorted by " + selectedCriteria, "Sort Completed", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
-layout.setVerticalGroup(layout.createSequentialGroup()
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(idLabel)
-        .addComponent(idField))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(patientNameLabel)
-        .addComponent(patientNameField))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(medicationLabel)
-        .addComponent(medicationField))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(dosageLabel)
-        .addComponent(dosageField))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(issueDateLabel)
-        .addComponent(issueDatePicker))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(administeredByLabel)
-        .addComponent(administeredByField))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(timeframeStartLabel)
-        .addComponent(timeframeStartSpinner))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(timeframeEndLabel)
-        .addComponent(timeframeEndSpinner))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(searchLabel)
-        .addComponent(searchField)
-        .addComponent(searchButton))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(sortCriteriaLabel)
-        .addComponent(sortCriteriaComboBox))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(addButton)
-        .addComponent(updateButton)
-        .addComponent(deleteButton)
-        .addComponent(refreshButton)
-        .addComponent(wipeButton)
-        .addComponent(exportButton)
-        .addComponent(logoutButton))
-    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        .addComponent(sortButton)
-        .addComponent(queueButton)
-        .addComponent(viewQueueButton)
-        .addComponent(checkQueueButton)
-        .addComponent(wipeQueueButton)
-        .addComponent(saveQueueToDatabaseButton))
-);
+        // Step 2: Add Queue Operations Buttons
+        JButton viewQueueButton = new JButton("View Queue");
+        viewQueueButton.setBackground(new Color(144, 238, 144));
+        viewQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (Prescription.prescriptionQueue == null || Prescription.prescriptionQueue.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "The queue is not initialized or is empty.", "Queue Status", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    StringBuilder queueContent = new StringBuilder();
+                    Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
+                    for (String[][] data : queue) {
+                        queueContent.append(Arrays.deepToString(data)).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
+
+        JButton checkQueueButton = new JButton("Check Queue Empty");
+        checkQueueButton.setBackground(new Color(144, 238, 144));
+        checkQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isEmpty = Prescription.isQueueEmpty();
+                JOptionPane.showMessageDialog(null, "Queue is " + (isEmpty ? "empty." : "not empty."), "Queue Status", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        JButton removeFromQueueButton = new JButton("Remove from Queue");
+        removeFromQueueButton.setBackground(new Color(255, 99, 71)); // Light red background for remove button
+        removeFromQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeFromQueue();
+            }
+        });
+
+        layout.setHorizontalGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(idLabel)
+                .addComponent(patientNameLabel)
+                .addComponent(medicationLabel)
+                .addComponent(dosageLabel)
+                .addComponent(issueDateLabel)
+                .addComponent(administeredByLabel)
+                .addComponent(prescribedTimeLabel)
+                .addComponent(timeAdministeredLabel)
+                .addComponent(searchLabel)
+                .addComponent(sortCriteriaLabel))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(idField)
+                .addComponent(patientNameField)
+                .addComponent(medicationField)
+                .addComponent(dosageField)
+                .addComponent(issueDatePicker)
+                .addComponent(administeredByField)
+                .addComponent(prescribedTimeSpinner)
+                .addComponent(timeAdministeredSpinner)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(searchField)
+                    .addComponent(searchButton))
+                .addComponent(sortCriteriaComboBox)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(addButton)
+                    .addComponent(updateButton)
+                    .addComponent(deleteButton)
+                    .addComponent(refreshButton)
+                    .addComponent(wipeButton)
+                    .addComponent(exportButton)
+                    .addComponent(logoutButton))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(sortButton)
+                    .addComponent(queueButton)
+                    .addComponent(viewQueueButton)
+                    .addComponent(checkQueueButton)
+                    .addComponent(wipeQueueButton)
+                    .addComponent(saveQueueToDatabaseButton)))
+        );
+
+        layout.setVerticalGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(idLabel)
+                .addComponent(idField))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(patientNameLabel)
+                .addComponent(patientNameField))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(medicationLabel)
+                .addComponent(medicationField))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(dosageLabel)
+                .addComponent(dosageField))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(issueDateLabel)
+                .addComponent(issueDatePicker))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(administeredByLabel)
+                .addComponent(administeredByField))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(prescribedTimeLabel)
+                .addComponent(prescribedTimeSpinner))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(timeAdministeredLabel)
+                .addComponent(timeAdministeredSpinner))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(searchLabel)
+                .addComponent(searchField)
+                .addComponent(searchButton))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(sortCriteriaLabel)
+                .addComponent(sortCriteriaComboBox))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(addButton)
+                .addComponent(updateButton)
+                .addComponent(deleteButton)
+                .addComponent(refreshButton)
+                .addComponent(wipeButton)
+                .addComponent(exportButton)
+                .addComponent(logoutButton))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(sortButton)
+                .addComponent(queueButton)
+                .addComponent(viewQueueButton)
+                .addComponent(checkQueueButton)
+                .addComponent(wipeQueueButton)
+                .addComponent(saveQueueToDatabaseButton))
+        );
         add(formPanel, BorderLayout.SOUTH);
 
         // Initial data load
@@ -394,20 +395,20 @@ layout.setVerticalGroup(layout.createSequentialGroup()
                         issueDatePicker.getModel().setSelected(true);
         
                         // Ensure time values are in the correct format
-                        String timeframeStart = selectedPrescription.getTimeframeStart();
-                        String timeframeEnd = selectedPrescription.getTimeframeEnd();
+                        String prescribedTime = selectedPrescription.getPrescribedTime();
+                        String timeAdministered = selectedPrescription.getTimeAdministered();
         
                         // Validate and set time values
-                        if (timeframeStart != null && !timeframeStart.matches("\\d{2}:\\d{2} [AP]M")) {
-                            throw new IllegalArgumentException("Timeframe start must be in the format hh:mm AM/PM");
+                        if (prescribedTime != null && !prescribedTime.matches("\\d{2}:\\d{2} [AP]M")) {
+                            throw new IllegalArgumentException("Prescribed time must be in the format hh:mm AM/PM");
                         }
-                        if (timeframeEnd != null && !timeframeEnd.matches("\\d{2}:\\d{2} [AP]M")) {
-                            throw new IllegalArgumentException("Timeframe end must be in the format hh:mm AM/PM");
+                        if (timeAdministered != null && !timeAdministered.matches("\\d{2}:\\d{2} [AP]M")) {
+                            throw new IllegalArgumentException("Time administered must be in the format hh:mm AM/PM");
                         }
         
                         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-                        timeframeStartSpinner.setValue(timeFormat.parse(timeframeStart));
-                        timeframeEndSpinner.setValue(timeFormat.parse(timeframeEnd));
+                        prescribedTimeSpinner.setValue(timeFormat.parse(prescribedTime));
+                        timeAdministeredSpinner.setValue(timeFormat.parse(timeAdministered));
                     } catch (ParseException | IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(PrescriptionGUI.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -415,8 +416,6 @@ layout.setVerticalGroup(layout.createSequentialGroup()
             }
         });
     }
-
-    // Method to search prescription by various fields
     private void searchPrescription() {
         String searchText = searchField.getText().toLowerCase();
         List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions().stream()
@@ -426,11 +425,12 @@ layout.setVerticalGroup(layout.createSequentialGroup()
                         p.getDosage().toLowerCase().contains(searchText) ||
                         p.getIssueDate().toLowerCase().contains(searchText) ||
                         p.getAdministeredBy().toLowerCase().contains(searchText) ||
-                        p.getTimeframeStart().toLowerCase().contains(searchText) ||
-                        p.getTimeframeEnd().toLowerCase().contains(searchText))
+                        p.getPrescribedTime().toLowerCase().contains(searchText) ||
+                        p.getTimeAdministered().toLowerCase().contains(searchText))
                 .collect(Collectors.toList());
         tableModel.setPrescriptions(prescriptions);
     }
+
 
     private void addPrescription() {
         try {
@@ -440,22 +440,22 @@ layout.setVerticalGroup(layout.createSequentialGroup()
             String dosage = dosageField.getText().trim();
             String issueDate = issueDatePicker.getJFormattedTextField().getText().trim();
             String administeredBy = administeredByField.getText().trim();
-            String timeframeStart = ((JSpinner.DateEditor) timeframeStartSpinner.getEditor()).getFormat().format(timeframeStartSpinner.getValue());
-            String timeframeEnd = ((JSpinner.DateEditor) timeframeEndSpinner.getEditor()).getFormat().format(timeframeEndSpinner.getValue());
-
-            validateInputs(patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
-
+            String prescribedTime = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
+            String timeAdministered = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
+    
+            validateInputs(patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered);
+    
             // Check for duplicate ID
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
             if (prescriptions.stream().anyMatch(p -> p.getPrescriptionId() == id)) {
                 throw new IllegalArgumentException("ID already exists. Please enter a unique ID.");
             }
-
-            Prescription newPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
+    
+            Prescription newPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered);
             DatabaseUtil.addPrescription(newPrescription);
             updatePrescriptionTable();
             JOptionPane.showMessageDialog(this, "Prescription added successfully.");
-            clearFields();
+            clearFields(); 
         } catch (NumberFormatException ex) {
             handleException(ex, "Invalid input. Please enter valid numeric data where required.");
         } catch (IllegalArgumentException ex) {
@@ -473,8 +473,8 @@ layout.setVerticalGroup(layout.createSequentialGroup()
             String dosage = dosageField.getText().trim();
             String issueDate = issueDatePicker.getJFormattedTextField().getText().trim();
             String administeredBy = administeredByField.getText().trim();
-            String timeframeStart = ((JSpinner.DateEditor) timeframeStartSpinner.getEditor()).getFormat().format(timeframeStartSpinner.getValue());
-            String timeframeEnd = ((JSpinner.DateEditor) timeframeEndSpinner.getEditor()).getFormat().format(timeframeEndSpinner.getValue());
+            String timeframeStart = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
+            String timeframeEnd = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
 
             validateInputs(patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
 
@@ -518,8 +518,8 @@ layout.setVerticalGroup(layout.createSequentialGroup()
         dosageField.setText("");
         issueDatePicker.getJFormattedTextField().setText("");
         administeredByField.setText("");
-        timeframeStartSpinner.setValue(new java.util.Date());
-        timeframeEndSpinner.setValue(new java.util.Date());
+        prescribedTimeSpinner.setValue(new java.util.Date());
+        timeAdministeredSpinner.setValue(new java.util.Date());
     }
 
     private void wipePrescriptionTable() {
@@ -535,7 +535,7 @@ layout.setVerticalGroup(layout.createSequentialGroup()
         String fileName = "prescriptions.csv";
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             // Write header
-            fileWriter.append("ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Timeframe Start,Timeframe End\n");
+            fileWriter.append("ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Prescribed Time,Time Administered\n");
     
             // Write prescription data
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
@@ -546,8 +546,8 @@ layout.setVerticalGroup(layout.createSequentialGroup()
                 fileWriter.append(prescription.getDosage() + ",");
                 fileWriter.append(prescription.getIssueDate() + ",");
                 fileWriter.append(prescription.getAdministeredBy() + ",");
-                fileWriter.append(prescription.getTimeframeStart() + ",");
-                fileWriter.append(prescription.getTimeframeEnd() + "\n");
+                fileWriter.append(prescription.getPrescribedTime() + ",");
+                fileWriter.append(prescription.getTimeAdministered() + "\n");
             }
     
             // Write queue data
@@ -563,12 +563,12 @@ layout.setVerticalGroup(layout.createSequentialGroup()
         
     }
 
-    private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String timeframeStart, String timeframeEnd) {
+    private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered) {
         if (!patientName.matches("[a-zA-Z ]+")) {
             throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
         }
     
-        if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || timeframeStart.isEmpty() || timeframeEnd.isEmpty()) {
+        if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || prescribedTime.isEmpty() || timeAdministered.isEmpty()) {
             throw new IllegalArgumentException("All fields must be filled.");
         }
     
@@ -586,10 +586,10 @@ layout.setVerticalGroup(layout.createSequentialGroup()
     
         // Validate timeframe formats (hh:mm AM/PM)
         if (!timeframeStart.matches("\\d{2}:\\d{2} [AP]M")) {
-            throw new IllegalArgumentException("Timeframe start must be in the format hh:mm AM/PM.");
+            throw new IllegalArgumentException("Prescribed Time must be in the format hh:mm AM/PM.");
         }
         if (!timeframeEnd.matches("\\d{2}:\\d{2} [AP]M")) {
-            throw new IllegalArgumentException("Timeframe end must be in the format hh:mm AM/PM.");
+            throw new IllegalArgumentException("Time Administered must be in the format hh:mm AM/PM.");
         }
     } 
 
@@ -612,7 +612,7 @@ layout.setVerticalGroup(layout.createSequentialGroup()
 }
 private void queuePrescription() {
     String[][] prescriptionData = new String[][] {
-        { idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), timeframeStartSpinner.getValue().toString(), timeframeEndSpinner.getValue().toString() }
+        { idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), prescribedTimeSpinner.getValue().toString(), timeAdministeredSpinner.getValue().toString() }
     };
     Prescription.addToQueue(prescriptionData);
     JOptionPane.showMessageDialog(this, "Prescription queued successfully!");

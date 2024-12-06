@@ -14,18 +14,18 @@ public class Prescription {
     private String dosage;
     private String issueDate;
     private String administeredBy;
-    private String timeframeStart;
-    private String timeframeEnd;
+    private String prescribedTime;
+    private String timeAdministered;
 
-    public Prescription(int prescriptionId, String patientName, String medication, String dosage, String issueDate, String administeredBy, String timeframeStart, String timeframeEnd) {
+    public Prescription(int prescriptionId, String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered) {
         this.prescriptionId = prescriptionId;
         this.patientName = patientName;
         this.medication = medication;
         this.dosage = dosage;
         this.issueDate = issueDate;
         this.administeredBy = administeredBy;
-        this.timeframeStart = timeframeStart;
-        this.timeframeEnd = timeframeEnd;
+        this.prescribedTime = prescribedTime;
+        this.timeAdministered = timeAdministered;
     }
 
     // Getters and Setters
@@ -77,20 +77,20 @@ public class Prescription {
         this.administeredBy = administeredBy;
     }
 
-    public String getTimeframeStart() {
-        return timeframeStart;
+    public String getPrescribedTime() {
+        return prescribedTime;
     }
 
-    public void setTimeframeStart(String timeframeStart) {
-        this.timeframeStart = timeframeStart;
+    public void setPrescribedTime(String prescribedTime) {
+        this.prescribedTime = prescribedTime;
     }
 
-    public String getTimeframeEnd() {
-        return timeframeEnd;
+    public String getTimeAdministered() {
+        return timeAdministered;
     }
 
-    public void setTimeframeEnd(String timeframeEnd) {
-        this.timeframeEnd = timeframeEnd;
+    public void setTimeAdministered(String timeAdministered) {
+        this.timeAdministered = timeAdministered;
     }
 
     static Queue<String[][]> prescriptionQueue = new LinkedList<>();

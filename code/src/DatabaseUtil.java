@@ -38,8 +38,8 @@ public class DatabaseUtil {
                         rs.getString("dosage"),
                         rs.getString("issue_date"),
                         rs.getString("administered_by"),
-                        rs.getString("timeframe_start"),
-                        rs.getString("timeframe_end")
+                        rs.getString("prescribed_time"),
+                        rs.getString("time_administered")
                 );
                 prescriptions.add(prescription);
             }
@@ -51,7 +51,7 @@ public class DatabaseUtil {
 
     // Method to add a prescription to the database
     public static void addPrescription(Prescription newPrescription) {
-        String query = "INSERT INTO prescriptions (prescription_id, patient_name, medication, dosage, issue_date, administered_by, timeframe_start, timeframe_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO prescriptions (prescription_id, patient_name, medication, dosage, issue_date, administered_by, prescribed_time, time_administered) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -62,8 +62,8 @@ public class DatabaseUtil {
             pstmt.setString(4, newPrescription.getDosage());
             pstmt.setString(5, newPrescription.getIssueDate());
             pstmt.setString(6, newPrescription.getAdministeredBy());
-            pstmt.setString(7, newPrescription.getTimeframeStart());
-            pstmt.setString(8, newPrescription.getTimeframeEnd());
+            pstmt.setString(7, newPrescription.getPrescribedTime());
+            pstmt.setString(8, newPrescription.getTimeAdministered());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -73,7 +73,7 @@ public class DatabaseUtil {
 
     // Method to update a prescription in the database
     public static void updatePrescription(Prescription updatedPrescription) {
-        String query = "UPDATE prescriptions SET patient_name = ?, medication = ?, dosage = ?, issue_date = ?, administered_by = ?, timeframe_start = ?, timeframe_end = ? WHERE prescription_id = ?";
+        String query = "UPDATE prescriptions SET patient_name = ?, medication = ?, dosage = ?, issue_date = ?, administered_by = ?, prescribed_time = ?, time_administered = ? WHERE prescription_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -83,8 +83,8 @@ public class DatabaseUtil {
             pstmt.setString(3, updatedPrescription.getDosage());
             pstmt.setString(4, updatedPrescription.getIssueDate());
             pstmt.setString(5, updatedPrescription.getAdministeredBy());
-            pstmt.setString(6, updatedPrescription.getTimeframeStart());
-            pstmt.setString(7, updatedPrescription.getTimeframeEnd());
+            pstmt.setString(6, updatedPrescription.getPrescribedTime());
+            pstmt.setString(7, updatedPrescription.getTimeAdministered());
             pstmt.setInt(8, updatedPrescription.getPrescriptionId());
 
             pstmt.executeUpdate();
@@ -178,7 +178,7 @@ public class DatabaseUtil {
                     tempComparator = Comparator.comparing(Prescription::getIssueDate);
                     break;
                 case "time":
-                    tempComparator = Comparator.comparing(Prescription::getTimeframeStart);
+                    tempComparator = Comparator.comparing(Prescription::getPrescribedTime);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid sort criteria: " + criteria);
@@ -204,6 +204,5 @@ public class DatabaseUtil {
             e.printStackTrace();
         }
     }
-    
     
 }
