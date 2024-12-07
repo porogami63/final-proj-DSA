@@ -118,27 +118,29 @@ public class Prescription {
     static PriorityQueue<String[]> prescriptionQueue = new PriorityQueue<>(new Comparator<String[]>() {
         @Override
         public int compare(String[] p1, String[] p2) {
-            String condition1 = p1[8];
-            String condition2 = p2[8];
-            return getPriority(condition1) - getPriority(condition2);
+            String classification1 = p1[8];
+            String classification2 = p2[8];
+            return Integer.compare(getPriority(classification1), getPriority(classification2));
         }
 
-        private int getPriority(String condition) {
-            switch (condition.toLowerCase()) {
-                case "critical":
+        private int getPriority(String classification) {
+            switch (classification.toUpperCase()) {
+                case "CRITICAL":
                     return 1;
-                case "moderate":
+                case "MODERATE":
                     return 2;
-                case "stable":
+                case "STABLE":
                     return 3;
                 default:
-                    return 4;
+                    return Integer.MAX_VALUE;
             }
         }
     });
 
     public static void addToQueue(String[][] prescriptionData) {
-        prescriptionQueue.add(prescriptionData[0]);
+        for (String[] prescription : prescriptionData) {
+            prescriptionQueue.add(prescription);
+        }
     }
 
     public static String[] removeFromQueue() {
@@ -173,5 +175,16 @@ public class Prescription {
                 return true; // Remove if date is unparseable
             }
         });
+    }
+
+    public static void main(String[] args) {
+        String[][] testPrescriptions = {
+            {"1", "John Doe", "Med1", "10", "2023-10-01", "Dr. Smith", "08:00 AM", "09:00 AM", "STABLE"},
+            {"2", "Jane Doe", "Med2", "20", "2023-10-02", "Dr. Smith", "08:00 AM", "09:00 AM", "CRITICAL"},
+            {"3", "Jim Doe", "Med3", "30", "2023-10-03", "Dr. Smith", "08:00 AM", "09:00 AM", "MODERATE"}
+        };
+
+        Prescription.addToQueue(testPrescriptions);
+        Prescription.printQueue();
     }
 }

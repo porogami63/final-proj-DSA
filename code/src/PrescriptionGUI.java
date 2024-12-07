@@ -30,8 +30,6 @@ public class PrescriptionGUI extends JFrame {
     private JTextField searchField;
     private JComboBox<String> classificationComboBox;
     private JTextField symptomsField;
-    private JComboBox<String> conditionField; 
-
     public PrescriptionGUI() {
         setTitle("MyManager : Prescription Management System");
         setSize(800, 600);
@@ -102,9 +100,7 @@ public class PrescriptionGUI extends JFrame {
         JSpinner.DateEditor endEditor = new JSpinner.DateEditor(timeAdministeredSpinner, "hh:mm a");
         timeAdministeredSpinner.setEditor(endEditor);
 
-        classificationComboBox = new JComboBox<>(new String[]{"STABLE", "MODERATE", "CRITICAL"});
-        conditionField = new JComboBox<>(new String[]{"Critical", "Moderate", "Stable"}); // Initialize conditionField
-
+        classificationComboBox = new JComboBox<>(new String[]{"STABLE", "MODERATE", "CRITICAL"});        
     
 
         // Search field and button
@@ -631,14 +627,34 @@ add(formPanel, BorderLayout.SOUTH);
     DatabaseUtil.sortPrescriptions(prescriptions, sortBy);
     tableModel.setPrescriptions(prescriptions);
 }
-    private void queuePrescription() {
-        String condition = conditionField.getSelectedItem().toString();
-        String[] prescriptionData = new String[] {
-            idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), prescribedTimeSpinner.getValue().toString(), timeAdministeredSpinner.getValue().toString(), condition
-        };
-        Prescription.addToQueue(new String[][]{prescriptionData});
-        JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
-    }
+private void queuePrescription() {
+    String classification = classificationComboBox.getSelectedItem().toString();
+    System.out.println("Selected classification: " + classification); // Debugging line
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+
+    String issueDate = sdf.format(issueDatePicker.getModel().getValue());
+    String prescribedTime = timeFormat.format(prescribedTimeSpinner.getValue());
+    String timeAdministered = timeFormat.format(timeAdministeredSpinner.getValue());
+
+    String[] prescriptionData = new String[] {
+        idField.getText(), 
+        patientNameField.getText(), 
+        medicationField.getText(), 
+        dosageField.getText(), 
+        issueDate, 
+        administeredByField.getText(), 
+        prescribedTime, 
+        timeAdministered, 
+        classification
+    };
+
+    Prescription.addToQueue(new String[][]{prescriptionData});
+    Prescription.printQueue(); // Debugging line to print queue contents
+    JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
+}
+
 private void removeFromQueue() {
     String idToRemove = JOptionPane.showInputDialog(this, "Enter the ID of the prescription to remove from the queue:");
 

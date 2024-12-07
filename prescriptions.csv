@@ -1,17 +1,9 @@
-ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Timeframe Start,Timeframe End
-1,joseph,Neozep,5000,2024-01-03,cielo,10:08 AM,04:08 PM
-2,KURT,neozep,222,2024-12-12,santos,04:08 PM,04:08 PM
-3,SANTOS,neozep,2222,2024-12-02,UKURT,11:43 PM,09:43 AM
-4,NICHOLO,gamot,50000,2024-12-02,JOSEPH,03:43 PM,04:43 PM
-5,ADMIN,promethazine,5000,2024-12-03,me,04:50 PM,07:50 AM
-6,a,yes,100,2024-12-18,doctor,05:39 PM,05:39 PM
-7,angie,Medicol,200,2024-12-02,santos kurt,07:32 PM,07:34 PM
-8,basti,Neozep,100,2024-01-03,cielo,08:08 PM,09:08 PM
-1,joseph,Neozep,5000,Wed Jan 03 19:57:03 PST 2024,cielo,Thu Jan 01 10:08:00 PST 1970,Thu Jan 01 16:08:00 PST 1970
-2,KURT,neozep,222,Thu Dec 12 19:57:03 PST 2024,santos,Thu Jan 01 16:08:00 PST 1970,Thu Jan 01 16:08:00 PST 1970
-3,SANTOS,neozep,2222,Mon Dec 02 19:57:03 PST 2024,UKURT,Thu Jan 01 23:43:00 PST 1970,Thu Jan 01 09:43:00 PST 1970
-4,NICHOLO,gamot,50000,Mon Dec 02 19:57:03 PST 2024,JOSEPH,Thu Jan 01 15:43:00 PST 1970,Thu Jan 01 16:43:00 PST 1970
-5,ADMIN,promethazine,5000,Tue Dec 03 19:57:03 PST 2024,me,Thu Jan 01 16:50:00 PST 1970,Thu Jan 01 07:50:00 PST 1970
-6,a,yes,100,Wed Dec 18 19:57:03 PST 2024,doctor,Thu Jan 01 17:39:00 PST 1970,Thu Jan 01 17:39:00 PST 1970
-7,angie,Medicol,200,Mon Dec 02 19:57:03 PST 2024,santos kurt,Thu Jan 01 19:32:00 PST 1970,Thu Jan 01 19:34:00 PST 1970
-8,basti,Neozep,100,Wed Jan 03 19:57:03 PST 2024,cielo,Thu Jan 01 20:08:00 PST 1970,Thu Jan 01 21:08:00 PST 1970
+ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Prescribed Time,Time Administered,Classification,Symptoms
+1,kurt,Medicine,255,2024-12-07,Doctor,05:59 PM,05:59 PM,CRITICAL,Sick
+2,Joseph Cahindi,Medicine,345,2024-12-07,Doctor,05:59 PM,03:59 PM,STABLE,Fever
+3,Cielo Salazar,Medicine,550,2024-12-07,Doctor,05:59 PM,05:59 PM,CRITICAL,Staph Infection
+4,Nicholo Cruz,Medicine,550,2024-12-07,Doctor,05:59 PM,05:59 PM,MODERATE,Staph Infection
+1,kurt,Medicine,255,Sat Dec 07 19:06:51 PST 2024,Doctor,Thu Jan 01 17:59:00 PST 1970,Thu Jan 01 17:59:00 PST 1970,CRITICAL
+3,Cielo Salazar,Medicine,550,Sat Dec 07 19:06:51 PST 2024,Doctor,Thu Jan 01 17:59:00 PST 1970,Thu Jan 01 17:59:00 PST 1970,CRITICAL
+2,Joseph Cahindi,Medicine,345,Sat Dec 07 19:06:51 PST 2024,Doctor,Thu Jan 01 17:59:00 PST 1970,Thu Jan 01 15:59:00 PST 1970,STABLE
+4,Nicholo Cruz,Medicine,550,Sat Dec 07 19:06:51 PST 2024,Doctor,Thu Jan 01 17:59:00 PST 1970,Thu Jan 01 17:59:00 PST 1970,MODERATE
