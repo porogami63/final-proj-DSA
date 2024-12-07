@@ -200,7 +200,7 @@ public class DatabaseUtil {
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
     
-            for (String[][] prescriptionData : Prescription.prescriptionQueue) {
+            for (String[] prescriptionData : Prescription.prescriptionQueue) {
                 pstmt.setString(1, Arrays.deepToString(prescriptionData));
                 pstmt.addBatch();
             }

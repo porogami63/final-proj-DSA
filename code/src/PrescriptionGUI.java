@@ -30,9 +30,7 @@ public class PrescriptionGUI extends JFrame {
     private JTextField searchField;
     private JComboBox<String> classificationComboBox;
     private JTextField symptomsField;
-    
-
-    
+    private JComboBox<String> conditionField; 
 
     public PrescriptionGUI() {
         setTitle("MyManager : Prescription Management System");
@@ -41,11 +39,8 @@ public class PrescriptionGUI extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Initialize table model and pass it to the JTable
         tableModel = new PrescriptionTableModel();
         prescriptionTable = new JTable(tableModel);
-
-        // Customize table header
         JTableHeader header = prescriptionTable.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setBackground(Color.LIGHT_GRAY);
@@ -108,6 +103,8 @@ public class PrescriptionGUI extends JFrame {
         timeAdministeredSpinner.setEditor(endEditor);
 
         classificationComboBox = new JComboBox<>(new String[]{"STABLE", "MODERATE", "CRITICAL"});
+        conditionField = new JComboBox<>(new String[]{"Critical", "Moderate", "Stable"}); // Initialize conditionField
+
     
 
         // Search field and button
@@ -258,8 +255,8 @@ public class PrescriptionGUI extends JFrame {
                     JOptionPane.showMessageDialog(null, "The queue is not initialized or is empty.", "Queue Status", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     StringBuilder queueContent = new StringBuilder();
-                    Queue<String[][]> queue = Prescription.prescriptionQueue; // Directly access the queue
-                    for (String[][] data : queue) {
+                    Queue<String[]> queue = Prescription.prescriptionQueue; // Directly access the queue
+                    for (String[] data : queue) {
                         queueContent.append(Arrays.deepToString(data)).append("\n");
                     }
                     JOptionPane.showMessageDialog(null, queueContent.toString(), "Queue Content", JOptionPane.INFORMATION_MESSAGE);
@@ -580,10 +577,8 @@ add(formPanel, BorderLayout.SOUTH);
             }
     
             // Write queue data
-            for (String[][] prescriptionData : Prescription.prescriptionQueue) {
-                for (String[] row : prescriptionData) {
-                    fileWriter.append(String.join(",", row)).append("\n");
-                }
+            for (String[] prescriptionData : Prescription.prescriptionQueue) {
+                fileWriter.append(String.join(",", prescriptionData)).append("\n");
             }
             JOptionPane.showMessageDialog(this, "Exported to CSV successfully.");
         } catch (IOException e) {
@@ -636,23 +631,23 @@ add(formPanel, BorderLayout.SOUTH);
     DatabaseUtil.sortPrescriptions(prescriptions, sortBy);
     tableModel.setPrescriptions(prescriptions);
 }
-private void queuePrescription() {
-    String[][] prescriptionData = new String[][] {
-        { idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), prescribedTimeSpinner.getValue().toString(), timeAdministeredSpinner.getValue().toString() }
-    };
-    Prescription.addToQueue(prescriptionData);
-    JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
-}
-
+    private void queuePrescription() {
+        String condition = conditionField.getSelectedItem().toString();
+        String[] prescriptionData = new String[] {
+            idField.getText(), patientNameField.getText(), medicationField.getText(), dosageField.getText(), issueDatePicker.getModel().getValue().toString(), administeredByField.getText(), prescribedTimeSpinner.getValue().toString(), timeAdministeredSpinner.getValue().toString(), condition
+        };
+        Prescription.addToQueue(new String[][]{prescriptionData});
+        JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
+    }
 private void removeFromQueue() {
     String idToRemove = JOptionPane.showInputDialog(this, "Enter the ID of the prescription to remove from the queue:");
 
     if (idToRemove != null && !idToRemove.trim().isEmpty()) {
         boolean removed = false;
-        Queue<String[][]> updatedQueue = new LinkedList<>();
+        PriorityQueue<String[]> updatedQueue = new PriorityQueue<>();
         
-        for (String[][] data : Prescription.prescriptionQueue) {
-            if (data[0][0].equals(idToRemove)) {
+        for (String[] data : Prescription.prescriptionQueue) {
+            if (data[0].equals(idToRemove)) {
                 removed = true;
             } else {
                 updatedQueue.add(data);

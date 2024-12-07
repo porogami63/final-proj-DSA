@@ -1,11 +1,12 @@
 package src;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 
 public class Prescription {
     private int prescriptionId;
@@ -18,7 +19,6 @@ public class Prescription {
     private String timeAdministered;
     private String classification; // New field
     private String symptoms; // New field
-
 
     public Prescription(int prescriptionId, String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered, String symptoms, String classification) {
         this.prescriptionId = prescriptionId;
@@ -98,26 +98,6 @@ public class Prescription {
         this.timeAdministered = timeAdministered;
     }
 
-    static Queue<String[][]> prescriptionQueue = new LinkedList<>();
-
-    public static void addToQueue(String[][] prescriptionData) {
-        prescriptionQueue.add(prescriptionData);
-    }
-
-    public static String[][] removeFromQueue() {
-        return prescriptionQueue.poll();
-    }
-
-    public static boolean isQueueEmpty() {
-        return prescriptionQueue.isEmpty();
-    }
-
-    public static void printQueue() {
-        for (String[][] data : prescriptionQueue) {
-            System.out.println(Arrays.deepToString(data));
-        }
-    }
-
     public String getClassification() {
         return classification;
     }
@@ -134,18 +114,62 @@ public class Prescription {
         this.symptoms = symptoms;
     }
 
+    // Priority queue with custom comparator for prioritizing prescriptions
+    static PriorityQueue<String[]> prescriptionQueue = new PriorityQueue<>(new Comparator<String[]>() {
+        @Override
+        public int compare(String[] p1, String[] p2) {
+            String condition1 = p1[8];
+            String condition2 = p2[8];
+            return getPriority(condition1) - getPriority(condition2);
+        }
+
+        private int getPriority(String condition) {
+            switch (condition.toLowerCase()) {
+                case "critical":
+                    return 1;
+                case "moderate":
+                    return 2;
+                case "stable":
+                    return 3;
+                default:
+                    return 4;
+            }
+        }
+    });
+
+    public static void addToQueue(String[][] prescriptionData) {
+        prescriptionQueue.add(prescriptionData[0]);
+    }
+
+    public static String[] removeFromQueue() {
+        return prescriptionQueue.poll();
+    }
+
+    public static boolean isQueueEmpty() {
+        return prescriptionQueue.isEmpty();
+    }
+
+    public static PriorityQueue<String[]> getQueue() {
+        return prescriptionQueue;
+    }
+
+    public static void printQueue() {
+        for (String[] data : prescriptionQueue) {
+            System.out.println(Arrays.toString(data));
+        }
+    }
 
     // Remove elements based on timeframe
     public static void removeElementsBasedOnTimeframe() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        Queue<String[][]> queue = prescriptionQueue;
+        Queue<String[]> queue = prescriptionQueue;
         queue.removeIf(data -> {
             try {
-                Date date = sdf.parse(data[0][4]);
+                Date date = sdf.parse(data[4]);
                 // Add your logic to check the timeframe
                 return false;
             } catch (ParseException e) {
-                System.err.println("Unparseable date: " + data[0][4]);
+                System.err.println("Unparseable date: " + data[4]);
                 return true; // Remove if date is unparseable
             }
         });
