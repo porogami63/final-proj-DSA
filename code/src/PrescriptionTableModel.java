@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PrescriptionTableModel extends AbstractTableModel {
     private final String[] columnNames = {
-        "ID", "Patient Name", "Medication", "Dosage", "Issue Date", "Administered By", "Prescribed Time", "Time Administered"
+        "ID", "Patient Name", "Medication", "Dosage", "Issue Date", "Administered By", "Prescribed Time", "Time Administered", "Classification", "Symptoms"
     };
     private List<Prescription> prescriptions;
 
@@ -53,6 +53,10 @@ public class PrescriptionTableModel extends AbstractTableModel {
                 return prescription.getPrescribedTime();
             case 7:
                 return prescription.getTimeAdministered();
+            case 8:
+                return prescription.getClassification(); // New field
+            case 9:
+                return prescription.getSymptoms(); // New field
             default:
                 return null;
         }

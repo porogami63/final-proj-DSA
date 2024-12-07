@@ -16,8 +16,11 @@ public class Prescription {
     private String administeredBy;
     private String prescribedTime;
     private String timeAdministered;
+    private String classification; // New field
+    private String symptoms; // New field
 
-    public Prescription(int prescriptionId, String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered) {
+
+    public Prescription(int prescriptionId, String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered, String symptoms, String classification) {
         this.prescriptionId = prescriptionId;
         this.patientName = patientName;
         this.medication = medication;
@@ -26,6 +29,8 @@ public class Prescription {
         this.administeredBy = administeredBy;
         this.prescribedTime = prescribedTime;
         this.timeAdministered = timeAdministered;
+        this.classification = classification;
+        this.symptoms = symptoms;
     }
 
     // Getters and Setters
@@ -112,6 +117,23 @@ public class Prescription {
             System.out.println(Arrays.deepToString(data));
         }
     }
+
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
+    }
+
+    public String getSymptoms() {
+        return symptoms;
+    }
+
+    public void setSymptoms(String symptoms) {
+        this.symptoms = symptoms;
+    }
+
 
     // Remove elements based on timeframe
     public static void removeElementsBasedOnTimeframe() {

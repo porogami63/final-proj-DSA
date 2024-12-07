@@ -28,6 +28,11 @@ public class PrescriptionGUI extends JFrame {
     private JDatePickerImpl issueDatePicker;
     private JSpinner prescribedTimeSpinner, timeAdministeredSpinner;
     private JTextField searchField;
+    private JComboBox<String> classificationComboBox;
+    private JTextField symptomsField;
+    
+
+    
 
     public PrescriptionGUI() {
         setTitle("MyManager : Prescription Management System");
@@ -85,7 +90,9 @@ public class PrescriptionGUI extends JFrame {
         JLabel administeredByLabel = new JLabel("Administered By:");
         administeredByField = new JTextField();
         JLabel prescribedTimeLabel = new JLabel("Prescribed Time:");
-
+        JLabel classificationLabel = new JLabel("Classification");
+        JLabel symptomsLabel = new JLabel("Symptoms");
+        JTextField symptomsField = new JTextField(20); // Changed to JTextField
         // Initialize and configure the prescribed time spinner
         SpinnerDateModel startModel = new SpinnerDateModel();
         prescribedTimeSpinner = new JSpinner(startModel);
@@ -99,6 +106,10 @@ public class PrescriptionGUI extends JFrame {
         timeAdministeredSpinner = new JSpinner(endModel);
         JSpinner.DateEditor endEditor = new JSpinner.DateEditor(timeAdministeredSpinner, "hh:mm a");
         timeAdministeredSpinner.setEditor(endEditor);
+
+        classificationComboBox = new JComboBox<>(new String[]{"STABLE", "MODERATE", "CRITICAL"});
+        symptomsField = new JTextField();
+    
 
         // Search field and button
         JLabel searchLabel = new JLabel("Search:");
@@ -276,81 +287,37 @@ public class PrescriptionGUI extends JFrame {
             }
         });
 
-        layout.setHorizontalGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(idLabel)
-                .addComponent(patientNameLabel)
-                .addComponent(medicationLabel)
-                .addComponent(dosageLabel)
-                .addComponent(issueDateLabel)
-                .addComponent(administeredByLabel)
-                .addComponent(prescribedTimeLabel)
-                .addComponent(timeAdministeredLabel)
-                .addComponent(searchLabel)
-                .addComponent(sortCriteriaLabel))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(idField)
-                .addComponent(patientNameField)
-                .addComponent(medicationField)
-                .addComponent(dosageField)
-                .addComponent(issueDatePicker)
-                .addComponent(administeredByField)
-                .addComponent(prescribedTimeSpinner)
-                .addComponent(timeAdministeredSpinner)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(searchField)
-                    .addComponent(searchButton))
-                .addComponent(sortCriteriaComboBox)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(addButton)
-                    .addComponent(updateButton)
-                    .addComponent(deleteButton)
-                    .addComponent(refreshButton)
-                    .addComponent(wipeButton)
-                    .addComponent(exportButton)
-                    .addComponent(logoutButton))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(sortButton)
-                    .addComponent(queueButton)
-                    .addComponent(viewQueueButton)
-                    .addComponent(checkQueueButton)
-                    .addComponent(wipeQueueButton)
-                    .addComponent(saveQueueToDatabaseButton)))
-        );
-
-        layout.setVerticalGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(idLabel)
-                .addComponent(idField))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(patientNameLabel)
-                .addComponent(patientNameField))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(medicationLabel)
-                .addComponent(medicationField))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(dosageLabel)
-                .addComponent(dosageField))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(issueDateLabel)
-                .addComponent(issueDatePicker))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(administeredByLabel)
-                .addComponent(administeredByField))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(prescribedTimeLabel)
-                .addComponent(prescribedTimeSpinner))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(timeAdministeredLabel)
-                .addComponent(timeAdministeredSpinner))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(searchLabel)
+        layout.setHorizontalGroup(
+    layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addComponent(idLabel)
+            .addComponent(patientNameLabel)
+            .addComponent(medicationLabel)
+            .addComponent(dosageLabel)
+            .addComponent(issueDateLabel)
+            .addComponent(administeredByLabel)
+            .addComponent(prescribedTimeLabel)
+            .addComponent(timeAdministeredLabel)
+            .addComponent(classificationLabel) // New field
+            .addComponent(symptomsLabel) // New field
+            .addComponent(searchLabel)
+            .addComponent(sortCriteriaLabel))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addComponent(idField)
+            .addComponent(patientNameField)
+            .addComponent(medicationField)
+            .addComponent(dosageField)
+            .addComponent(issueDatePicker)
+            .addComponent(administeredByField)
+            .addComponent(prescribedTimeSpinner)
+            .addComponent(timeAdministeredSpinner)
+            .addComponent(classificationComboBox) // New field
+            .addComponent(symptomsField) // New field
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(searchField)
                 .addComponent(searchButton))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(sortCriteriaLabel)
-                .addComponent(sortCriteriaComboBox))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(sortCriteriaComboBox)
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(addButton)
                 .addComponent(updateButton)
                 .addComponent(deleteButton)
@@ -358,16 +325,71 @@ public class PrescriptionGUI extends JFrame {
                 .addComponent(wipeButton)
                 .addComponent(exportButton)
                 .addComponent(logoutButton))
-            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(sortButton)
                 .addComponent(queueButton)
                 .addComponent(viewQueueButton)
                 .addComponent(checkQueueButton)
                 .addComponent(wipeQueueButton)
-                .addComponent(saveQueueToDatabaseButton))
-        );
-        add(formPanel, BorderLayout.SOUTH);
+                .addComponent(saveQueueToDatabaseButton)))
+);
 
+layout.setVerticalGroup(
+    layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(idLabel)
+            .addComponent(idField))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(patientNameLabel)
+            .addComponent(patientNameField))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(medicationLabel)
+            .addComponent(medicationField))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(dosageLabel)
+            .addComponent(dosageField))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(issueDateLabel)
+            .addComponent(issueDatePicker))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(administeredByLabel)
+            .addComponent(administeredByField))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(prescribedTimeLabel)
+            .addComponent(prescribedTimeSpinner))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(timeAdministeredLabel)
+            .addComponent(timeAdministeredSpinner))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(classificationLabel) // New field
+            .addComponent(classificationComboBox)) // New field
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(symptomsLabel) // New field
+            .addComponent(symptomsField)) // New field
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(searchLabel)
+            .addComponent(searchField)
+            .addComponent(searchButton))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(sortCriteriaLabel)
+            .addComponent(sortCriteriaComboBox))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(addButton)
+            .addComponent(updateButton)
+            .addComponent(deleteButton)
+            .addComponent(refreshButton)
+            .addComponent(wipeButton)
+            .addComponent(exportButton)
+            .addComponent(logoutButton))
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            .addComponent(sortButton)
+            .addComponent(queueButton)
+            .addComponent(viewQueueButton)
+            .addComponent(checkQueueButton)
+            .addComponent(wipeQueueButton)
+            .addComponent(saveQueueToDatabaseButton))
+);
+add(formPanel, BorderLayout.SOUTH);
         // Initial data load
         updatePrescriptionTable();
 
@@ -442,8 +464,10 @@ public class PrescriptionGUI extends JFrame {
             String administeredBy = administeredByField.getText().trim();
             String prescribedTime = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
             String timeAdministered = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
+            String classification = (String) classificationComboBox.getSelectedItem(); // New field
+            String symptoms = symptomsField.getText().trim(); // New field
     
-            validateInputs(patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered);
+            validateInputs(patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered, classification, symptoms);
     
             // Check for duplicate ID
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
@@ -451,7 +475,7 @@ public class PrescriptionGUI extends JFrame {
                 throw new IllegalArgumentException("ID already exists. Please enter a unique ID.");
             }
     
-            Prescription newPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered);
+            Prescription newPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered, classification, symptoms);
             DatabaseUtil.addPrescription(newPrescription);
             updatePrescriptionTable();
             JOptionPane.showMessageDialog(this, "Prescription added successfully.");
@@ -464,7 +488,6 @@ public class PrescriptionGUI extends JFrame {
             handleException(ex, "An error occurred while adding the prescription.");
         }
     }
-
     private void updatePrescription() {
         try {
             int id = Integer.parseInt(idField.getText().trim());
@@ -473,12 +496,14 @@ public class PrescriptionGUI extends JFrame {
             String dosage = dosageField.getText().trim();
             String issueDate = issueDatePicker.getJFormattedTextField().getText().trim();
             String administeredBy = administeredByField.getText().trim();
-            String timeframeStart = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
-            String timeframeEnd = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
-
-            validateInputs(patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
-
-            Prescription updatedPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, timeframeStart, timeframeEnd);
+            String prescribedTime = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
+            String timeAdministered = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
+            String classification = (String) classificationComboBox.getSelectedItem(); // New field
+            String symptoms = symptomsField.getText().trim(); // New field
+    
+            validateInputs(patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered, classification, symptoms);
+    
+            Prescription updatedPrescription = new Prescription(id, patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered, classification, symptoms);
             DatabaseUtil.updatePrescription(updatedPrescription);
             updatePrescriptionTable();
             JOptionPane.showMessageDialog(this, "Prescription updated successfully.");
@@ -520,8 +545,9 @@ public class PrescriptionGUI extends JFrame {
         administeredByField.setText("");
         prescribedTimeSpinner.setValue(new java.util.Date());
         timeAdministeredSpinner.setValue(new java.util.Date());
+        classificationComboBox.setSelectedIndex(0); // New field
+        symptomsField.setText(""); // New field
     }
-
     private void wipePrescriptionTable() {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to wipe all prescription data?", "Confirm Wipe", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
@@ -535,7 +561,7 @@ public class PrescriptionGUI extends JFrame {
         String fileName = "prescriptions.csv";
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             // Write header
-            fileWriter.append("ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Prescribed Time,Time Administered\n");
+            fileWriter.append("ID,Patient Name,Medication,Dosage,Issue Date,Administered By,Prescribed Time,Time Administered,Classification,Symptoms\n");
     
             // Write prescription data
             List<Prescription> prescriptions = DatabaseUtil.getAllPrescriptions();
@@ -547,7 +573,9 @@ public class PrescriptionGUI extends JFrame {
                 fileWriter.append(prescription.getIssueDate() + ",");
                 fileWriter.append(prescription.getAdministeredBy() + ",");
                 fileWriter.append(prescription.getPrescribedTime() + ",");
-                fileWriter.append(prescription.getTimeAdministered() + "\n");
+                fileWriter.append(prescription.getTimeAdministered() + ",");
+                fileWriter.append(prescription.getClassification() + ","); // New field
+                fileWriter.append(prescription.getSymptoms() + "\n"); // New field
             }
     
             // Write queue data
@@ -560,15 +588,14 @@ public class PrescriptionGUI extends JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error writing to CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
     }
 
-    private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered) {
+    private void validateInputs(String patientName, String medication, String dosage, String issueDate, String administeredBy, String prescribedTime, String timeAdministered, String classification, String symptoms) {
         if (!patientName.matches("[a-zA-Z ]+")) {
             throw new IllegalArgumentException("Patient name must contain only alphabetical characters and spaces.");
         }
     
-        if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || prescribedTime.isEmpty() || timeAdministered.isEmpty()) {
+        if (patientName.isEmpty() || medication.isEmpty() || dosage.isEmpty() || issueDate.isEmpty() || administeredBy.isEmpty() || prescribedTime.isEmpty() || timeAdministered.isEmpty() || classification.isEmpty() || symptoms.isEmpty()) {
             throw new IllegalArgumentException("All fields must be filled.");
         }
     
@@ -585,15 +612,13 @@ public class PrescriptionGUI extends JFrame {
         }
     
         // Validate timeframe formats (hh:mm AM/PM)
-        if (!timeframeStart.matches("\\d{2}:\\d{2} [AP]M")) {
+        if (!prescribedTime.matches("\\d{2}:\\d{2} [AP]M")) {
             throw new IllegalArgumentException("Prescribed Time must be in the format hh:mm AM/PM.");
         }
-        if (!timeframeEnd.matches("\\d{2}:\\d{2} [AP]M")) {
+        if (!timeAdministered.matches("\\d{2}:\\d{2} [AP]M")) {
             throw new IllegalArgumentException("Time Administered must be in the format hh:mm AM/PM.");
         }
-    } 
-
-    private void handleException(Exception ex, String userMessage) {
+    }    private void handleException(Exception ex, String userMessage) {
         if (ex instanceof NumberFormatException) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numeric data where required.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
         } else if (ex instanceof IllegalArgumentException) {

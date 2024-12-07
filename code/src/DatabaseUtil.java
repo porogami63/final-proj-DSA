@@ -8,8 +8,8 @@ import java.util.List;
 public class DatabaseUtil {
 
     private static final String URL = "jdbc:mysql://localhost:3306/prescription_inventory";
-    private static final String USER = "root"; // Change to your MySQL username
-    private static final String PASSWORD = "115320"; // Change to your MySQL password
+    private static final String USER = "root"; 
+    private static final String PASSWORD = "115320"; 
 
     private static List<Prescription> prescriptions = new ArrayList<>();
 
@@ -24,12 +24,12 @@ public class DatabaseUtil {
     // Method to get all prescriptions from the database
     public static List<Prescription> getAllPrescriptions() {
         prescriptions.clear();
-        String query = "SELECT * FROM prescriptions"; // Adjust the table name as needed
-
+        String query = "SELECT * FROM prescriptions";
+    
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
-
+    
             while (rs.next()) {
                 Prescription prescription = new Prescription(
                         rs.getInt("prescription_id"),
@@ -39,7 +39,9 @@ public class DatabaseUtil {
                         rs.getString("issue_date"),
                         rs.getString("administered_by"),
                         rs.getString("prescribed_time"),
-                        rs.getString("time_administered")
+                        rs.getString("time_administered"),
+                        rs.getString("classification"), // New field
+                        rs.getString("symptoms") // New field
                 );
                 prescriptions.add(prescription);
             }
@@ -48,14 +50,13 @@ public class DatabaseUtil {
         }
         return prescriptions;
     }
-
-    // Method to add a prescription to the database
+    
     public static void addPrescription(Prescription newPrescription) {
-        String query = "INSERT INTO prescriptions (prescription_id, patient_name, medication, dosage, issue_date, administered_by, prescribed_time, time_administered) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String query = "INSERT INTO prescriptions (prescription_id, patient_name, medication, dosage, issue_date, administered_by, prescribed_time, time_administered, classification, symptoms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-
+    
             pstmt.setInt(1, newPrescription.getPrescriptionId());
             pstmt.setString(2, newPrescription.getPatientName());
             pstmt.setString(3, newPrescription.getMedication());
@@ -64,20 +65,21 @@ public class DatabaseUtil {
             pstmt.setString(6, newPrescription.getAdministeredBy());
             pstmt.setString(7, newPrescription.getPrescribedTime());
             pstmt.setString(8, newPrescription.getTimeAdministered());
-
+            pstmt.setString(9, newPrescription.getClassification()); // New field
+            pstmt.setString(10, newPrescription.getSymptoms()); // New field
+    
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    // Method to update a prescription in the database
+    
     public static void updatePrescription(Prescription updatedPrescription) {
-        String query = "UPDATE prescriptions SET patient_name = ?, medication = ?, dosage = ?, issue_date = ?, administered_by = ?, prescribed_time = ?, time_administered = ? WHERE prescription_id = ?";
-
+        String query = "UPDATE prescriptions SET patient_name = ?, medication = ?, dosage = ?, issue_date = ?, administered_by = ?, prescribed_time = ?, time_administered = ?, classification = ?, symptoms = ? WHERE prescription_id = ?";
+    
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-
+    
             pstmt.setString(1, updatedPrescription.getPatientName());
             pstmt.setString(2, updatedPrescription.getMedication());
             pstmt.setString(3, updatedPrescription.getDosage());
@@ -85,8 +87,10 @@ public class DatabaseUtil {
             pstmt.setString(5, updatedPrescription.getAdministeredBy());
             pstmt.setString(6, updatedPrescription.getPrescribedTime());
             pstmt.setString(7, updatedPrescription.getTimeAdministered());
-            pstmt.setInt(8, updatedPrescription.getPrescriptionId());
-
+            pstmt.setString(8, updatedPrescription.getClassification()); // New field
+            pstmt.setString(9, updatedPrescription.getSymptoms()); // New field
+            pstmt.setInt(10, updatedPrescription.getPrescriptionId());
+    
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
