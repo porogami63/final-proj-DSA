@@ -651,7 +651,6 @@ private void queuePrescription() {
     };
 
     Prescription.addToQueue(new String[][]{prescriptionData});
-    Prescription.printQueue(); // Debugging line to print queue contents
     JOptionPane.showMessageDialog(this, "Prescription queued successfully!");
 }
 
