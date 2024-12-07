@@ -92,7 +92,7 @@ public class PrescriptionGUI extends JFrame {
         JLabel prescribedTimeLabel = new JLabel("Prescribed Time:");
         JLabel classificationLabel = new JLabel("Classification");
         JLabel symptomsLabel = new JLabel("Symptoms");
-        JTextField symptomsField = new JTextField(20); // Changed to JTextField
+        symptomsField = new JTextField(20);
         // Initialize and configure the prescribed time spinner
         SpinnerDateModel startModel = new SpinnerDateModel();
         prescribedTimeSpinner = new JSpinner(startModel);
@@ -108,7 +108,6 @@ public class PrescriptionGUI extends JFrame {
         timeAdministeredSpinner.setEditor(endEditor);
 
         classificationComboBox = new JComboBox<>(new String[]{"STABLE", "MODERATE", "CRITICAL"});
-        symptomsField = new JTextField();
     
 
         // Search field and button
@@ -405,6 +404,8 @@ add(formPanel, BorderLayout.SOUTH);
                     medicationField.setText(selectedPrescription.getMedication());
                     dosageField.setText(selectedPrescription.getDosage());
                     administeredByField.setText(selectedPrescription.getAdministeredBy());
+                    classificationComboBox.setSelectedItem(selectedPrescription.getClassification()); // New field
+                    symptomsField.setText(selectedPrescription.getSymptoms()); // New field
                     try {
                         // Parse the issue date string to a Calendar object
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -464,8 +465,8 @@ add(formPanel, BorderLayout.SOUTH);
             String administeredBy = administeredByField.getText().trim();
             String prescribedTime = ((JSpinner.DateEditor) prescribedTimeSpinner.getEditor()).getFormat().format(prescribedTimeSpinner.getValue());
             String timeAdministered = ((JSpinner.DateEditor) timeAdministeredSpinner.getEditor()).getFormat().format(timeAdministeredSpinner.getValue());
-            String classification = (String) classificationComboBox.getSelectedItem(); // New field
-            String symptoms = symptomsField.getText().trim(); // New field
+            String classification = (String) classificationComboBox.getSelectedItem(); 
+            String symptoms = symptomsField.getText().trim();
     
             validateInputs(patientName, medication, dosage, issueDate, administeredBy, prescribedTime, timeAdministered, classification, symptoms);
     

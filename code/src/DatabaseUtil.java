@@ -40,8 +40,8 @@ public class DatabaseUtil {
                         rs.getString("administered_by"),
                         rs.getString("prescribed_time"),
                         rs.getString("time_administered"),
-                        rs.getString("classification"), // New field
-                        rs.getString("symptoms") // New field
+                        rs.getString("classification"),
+                        rs.getString("symptoms")
                 );
                 prescriptions.add(prescription);
             }
@@ -65,8 +65,8 @@ public class DatabaseUtil {
             pstmt.setString(6, newPrescription.getAdministeredBy());
             pstmt.setString(7, newPrescription.getPrescribedTime());
             pstmt.setString(8, newPrescription.getTimeAdministered());
-            pstmt.setString(9, newPrescription.getClassification()); // New field
-            pstmt.setString(10, newPrescription.getSymptoms()); // New field
+            pstmt.setString(9, newPrescription.getClassification());
+            pstmt.setString(10, newPrescription.getSymptoms());
     
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -87,8 +87,8 @@ public class DatabaseUtil {
             pstmt.setString(5, updatedPrescription.getAdministeredBy());
             pstmt.setString(6, updatedPrescription.getPrescribedTime());
             pstmt.setString(7, updatedPrescription.getTimeAdministered());
-            pstmt.setString(8, updatedPrescription.getClassification()); // New field
-            pstmt.setString(9, updatedPrescription.getSymptoms()); // New field
+            pstmt.setString(8, updatedPrescription.getClassification());
+            pstmt.setString(9, updatedPrescription.getSymptoms());
             pstmt.setInt(10, updatedPrescription.getPrescriptionId());
     
             pstmt.executeUpdate();
@@ -193,6 +193,7 @@ public class DatabaseUtil {
     
         prescriptions.sort(comparator);
     }
+
     public static void saveQueueToDatabase() {
         String query = "INSERT INTO queue (prescription_data) VALUES (?)";
     
@@ -208,5 +209,4 @@ public class DatabaseUtil {
             e.printStackTrace();
         }
     }
-    
 }
